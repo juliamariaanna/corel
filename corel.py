@@ -1,4 +1,4 @@
-import xlrd, numpy, re, sklearn.metrics, sklearn.linear_model, prettytable, os
+import xlrd, numpy, re, sklearn.metrics, sklearn.linear_model, prettytable, matplotlib.pyplot
 # Open file
 file=xlrd.open_workbook("./data.xls")
 sheet_index=None
@@ -71,6 +71,7 @@ for i in range(0, len(X)):
     TSS += (X_LAG[i] - sum(X_LAG)/len(X_LAG))**2
 
 # R^2 calculated by myself
+R2=RSS/TSS
 # print(f'R^2 = {RSS/TSS} calculated by myself')
 # Build table
 pt = prettytable.PrettyTable()
@@ -78,8 +79,14 @@ pt.field_names = ['X', 'X_LAG', 'X_LAGi']
 for i in range(0, len(X)):
     pt.add_row([X[i], X_LAG[i], X_LAGi[i]])
 # Save result
-output = open('corel_output.txt', 'a') if not os.path.exists('./corel_output.txt')\
-      else open('corel_output.txt', 'w')
+output = open('corel_output.txt', 'w')
 output.write(str(pt))
 output.write(f'\n\n\nf(x) = {k}*x + {b}\n')
-output.write(f'R^2 = {RSS/TSS}')
+output.write(f'R^2 = {R2}')
+# Build a plot
+matplotlib.pyplot.figure(figsize=(9, 6))
+matplotlib.pyplot.scatter(X, X_LAG, color='blue')
+matplotlib.pyplot.plot(X, X_LAGi, color='red')
+matplotlib.pyplot.text(min(X_LAG) * 1.1, max(X) * 1.1, \
+                       s=f'f(x) = {k}*x + {b}\nR^2 = {R2}')
+matplotlib.pyplot.show()
